@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>PERIN Stream</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Premium Apple TV & Futuristic Sea Fusion Colors */
+            --glass-bg: rgba(10, 15, 30, 0.4);
+            --glass-panel: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-focus: rgba(255, 255, 255, 0.15);
+            
+            /* Enhanced Sea & Oceanic Blues */
+            --sea-cyan: #00f4ff;
+            --sea-electric: #00a2ff;
+            --deep-blue: #091530;
+            --apple-white: #f5f5f7;
+            
+            --text-secondary: rgba(255, 255, 255, 0.6);
+            --premium-blur: blur(40px);
+            
+            /* Futuristic Ambient Glows */
+            --cyan-glow: opacity 0.4, 0 0 40px rgba(0, 244, 255, 0.3);
+            --panel-shadow: 0 30px 100px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        body { 
+            margin: 0;
+            background: #040814; 
+            color: var(--apple-white); 
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+            overflow-y: auto;
+            user-select: none;
+            -webkit-user-select: none;
+            min-height: 100vh;
+            padding-bottom: calc(115px + var(--safe-area-bottom)); /* Prevents bottom navigation overlap issues */
+            letter-spacing: -0.2px;
+        }
+
+        html { touch-action: manipulation; }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--sea-cyan); }
+
+        /* Dynamic Background Lighting Overhaul */
+        .dynamic-backdrop {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover; background-position: center;
+            z-index: 1; opacity: 0; transform: scale(1.03);
+            transition: opacity 1.8s cubic-bezier(0.25, 1, 0.5, 1), transform 1.8s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .backdrop-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 30%, rgba(0, 162, 255, 0.12) 0%, rgba(4, 8, 20, 0.9) 55%, #040814 100%);
+            z-index: 2; opacity: 0; transition: opacity 1.8s ease;
+        }
+
+        body.ready .dynamic-backdrop { opacity: 0.45; transform: scale(1); }
+        body.ready .backdrop-overlay { opacity: 1; }
+
+        /* Premium Apple-inspired Minimal/Whitish Intro Splash */
+        #splash {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #000000; display: flex; justify-content: center; align-items: center;
+            z-index: 9999; transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        #splash.fade-out { opacity: 0; pointer-events: none; }
+
+        .netflix-logo {
+            font-weight: 700; font-size: 6rem; letter-spacing: -2px;
+            background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 40%, rgba(255,255,255,0.7) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 50px rgba(255,255,255,0.15));
+            transform: scale(0.85); opacity: 0;
+            animation: appleIntro 2.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes appleIntro {
+            0% { transform: scale(0.85); opacity: 0; filter: blur(12px); letter-spacing: -6px; }
+            25% { opacity: 1; filter: blur(0px); }
+            100% { transform: scale(1); opacity: 1; letter-spacing: 2px; }
+        }
+
+        /* Apple TV Floating Pod Login */
+        .box { 
+            position: absolute; top: 48%; left: 50%; transform: translate(-50%, -50%) scale(0.95);
+            z-index: 10; background: var(--glass-bg); backdrop-filter: var(--premium-blur); -webkit-backdrop-filter: var(--premium-blur);
+            padding: 45px 35px; border-radius: 36px; box-shadow: var(--panel-shadow); 
+            border: 1px solid var(--glass-border); width: 90%; max-width: 360px; text-align: center; opacity: 0;
+            transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 1.2s ease, border-color 0.4s;
+            box-sizing: border-box;
+        }
+        .box:hover { border-color: rgba(0, 244, 255, 0.25); }
+        body.ready .box { transform: translate(-50%, -48%) scale(1); opacity: 1; }
+
+        h2 { margin: 0 0 35px 0; font-weight: 500; font-size: 2rem; letter-spacing: -0.5px; color: #fff; }
+        .input-group { position: relative; margin-bottom: 22px; }
+
+        input { 
+            background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); padding: 18px 22px; 
+            width: 100%; color: #fff; display: block; box-sizing: border-box; border-radius: 18px;
+            font-size: 1rem; font-family: inherit; transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        input:focus { outline: none; background: rgba(255, 255, 255, 0.07); border-color: var(--sea-cyan); box-shadow: 0 0 25px rgba(0, 244, 255, 0.15); transform: scale(1.015); }
+        input::placeholder { color: rgba(255, 255, 255, 0.3); }
+
+        .btn-auth { 
+            padding: 18px; width: 100%; cursor: pointer; background: var(--apple-white); color: #040814; 
+            border: none; border-radius: 18px; font-size: 1rem; font-weight: 600; letter-spacing: -0.1px;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1); margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+        }
+        .btn-auth:hover { background: var(--sea-cyan); box-shadow: 0 15px 35px rgba(0, 244, 255, 0.35); transform: translateY(-2px); color: #000; }
+        .toggle-mode-text { cursor: pointer; font-size: 0.9rem; color: var(--text-secondary); margin-top: 28px; transition: color 0.3s ease; display: inline-block; }
+        .toggle-mode-text:hover { color: var(--sea-cyan); text-shadow: 0 0 10px rgba(0,244,255,0.4); }
+        .state-message { font-size: 1.4rem; font-weight: 400; letter-spacing: -0.3px; line-height: 1.6; color: #fff; }
+
+        /* Dashboard Spaces */
+        .spatial-wrapper {
+            position: relative; z-index: 15; width: 94%; max-width: 1400px; margin: 20px auto;
+            opacity: 0; transform: scale(0.98) translateY(15px);
+            transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1); display: none;
+        }
+        .spatial-wrapper.active { display: block; opacity: 1; transform: scale(1) translateY(0); }
+
+        .spatial-panel {
+            background: rgba(10, 16, 32, 0.35); backdrop-filter: var(--premium-blur); -webkit-backdrop-filter: var(--premium-blur);
+            border-radius: 38px; border: 1px solid var(--glass-border); box-shadow: var(--panel-shadow);
+            padding: 40px; box-sizing: border-box;
+        }
+        
+        /* Persistent Sticky Blurred Navigation Bar for Title Display */
+        .spatial-header { 
+            display: flex; align-items: center; justify-content: space-between; 
+            position: sticky; top: -40px; z-index: 2000;
+            background: rgba(10, 16, 32, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            padding: 24px 40px; margin: -40px -40px 35px -40px; border-radius: 38px 38px 0 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .brand-logo { font-weight: 700; font-size: 2rem; letter-spacing: -1px; background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.7) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; cursor: pointer; filter: drop-shadow(0 2px 10px rgba(255,255,255,0.1)); }
+
+        /* Floating Apple TV Navigation Bar with Futuristic Light Accents */
+        .persistent-bottom-navbar {
+            position: fixed; bottom: calc(20px + var(--safe-area-bottom)); left: 50%; transform: translateX(-50%); z-index: 10000;
+            background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 26px; padding: 8px;
+            display: flex; align-items: center; gap: 4px; box-shadow: 0 40px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.2);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); opacity: 0; visibility: hidden; width: auto; max-width: 92%; overflow-x: auto; white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        .persistent-bottom-navbar::-webkit-scrollbar { display: none; }
+        .persistent-bottom-navbar.visible { opacity: 1; visibility: visible; }
+
+        .nav-capsule-btn { 
+            padding: 12px 24px; font-size: 0.9rem; color: rgba(255,255,255,0.6); cursor: pointer; border-radius: 20px; 
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1); font-weight: 500; letter-spacing: -0.1px; border: 1px solid transparent; 
+        }
+        /* Active Glowing Blue Light Pill Accent */
+        .nav-capsule-btn.active { 
+            color: #fff; 
+            background: linear-gradient(135deg, rgba(0, 162, 255, 0.3) 0%, rgba(0, 244, 255, 0.15) 100%); 
+            border-color: rgba(0, 244, 255, 0.4);
+            box-shadow: 0 10px 25px rgba(0, 244, 255, 0.2), inset 0 1px 0 rgba(255,255,255,0.2);
+            text-shadow: 0 0 8px rgba(255,255,255,0.5);
+        }
+        .nav-capsule-btn:hover:not(.active) { color: #fff; background: rgba(255, 255, 255, 0.08); }
+        .nav-capsule-btn.logout-accent:hover { color: #ff5252; background: rgba(255, 82, 82, 0.15); border-color: rgba(255, 82, 82, 0.2); }
+
+        /* Interactive Cinematic Showcase (Hero Banner) - Proportionate Overhaul */
+        .hero-view { 
+            position: relative; 
+            width: 100%; 
+            height: 42vh; 
+            min-height: 240px; 
+            max-height: 440px; 
+            border-radius: 28px; 
+            overflow: hidden; 
+            border: 1px solid rgba(255,255,255,0.08); 
+            margin-bottom: 45px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
+        }
+
+        @media (max-width: 768px) {
+            .spatial-header {
+                top: -20px;
+                padding: 16px 20px;
+                margin: -20px -20px 25px -20px;
+                border-radius: 28px 28px 0 0;
+            }
+            .hero-view { height: 35vh; min-height: 220px; }
+            .hero-details { width: 100% !important; padding: 20px !important; }
+            .hero-title { font-size: 1.6rem !important; }
+            .grid-layout-block { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important; gap: 14px !important; }
+            .rank-item-container { gap: 4px !important; }
+            .rank-huge-number { font-size: 4.5rem !important; min-width: 45px !important; letter-spacing: -4px !important; }
+            .series-detail-landscape { height: 30vh !important; min-height: 180px !important; }
+            .episode-item { flex-direction: column !important; align-items: flex-start !important; gap: 15px !important; padding: 14px !important; }
+            .episode-thumb-wrap { width: 100% !important; aspect-ratio: 16/9 !important; }
+            .spatial-panel { padding: 20px; border-radius: 28px; }
+            .nav-capsule-btn { padding: 10px 16px; font-size: 0.85rem; }
+        }
+
+        .hero-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.01); }
+        .hero-gradient {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to right, rgba(4, 8, 20, 0.95) 0%, rgba(4, 8, 20, 0.4) 50%, transparent 100%), linear-gradient(to top, rgba(4, 8, 20, 1) 0%, transparent 50%);
+            z-index: 2;
+        }
+        .hero-details { position: absolute; bottom: 0; left: 0; width: 60%; z-index: 3; padding: 45px; box-sizing: border-box; }
+        .hero-title { font-size: 2.6rem; font-weight: 700; margin: 0 0 12px 0; letter-spacing: -1px; line-height: 1.1; color: #fff; }
+        .hero-meta { display: flex; align-items: center; gap: 14px; font-size: 0.9rem; font-weight: 500; color: var(--text-secondary); margin-bottom: 25px; }
+        .meta-badge { background: rgba(255, 255, 255, 0.12); color: #fff; padding: 3px 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; border: 1px solid rgba(255,255,255,0.1); }
+
+        .hero-actions { display: flex; gap: 14px; }
+        .btn-prime { 
+            background: var(--apple-white); color: #040814; padding: 13px 32px; border-radius: 14px; font-size: 0.95rem; font-weight: 600; border: none; cursor: pointer; 
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 4px 15px rgba(255,255,255,0.15);
+        }
+        .btn-prime:hover { background: var(--sea-cyan); transform: translateY(-2px); box-shadow: 0 15px 30px rgba(0, 244, 255, 0.35); color: #000; }
+        .btn-sub { background: rgba(255, 255, 255, 0.08); color: #fff; padding: 13px 26px; border-radius: 14px; font-size: 0.95rem; font-weight: 600; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.3s; }
+        .btn-sub:hover { background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.25); }
+
+        /* Categorized Content Sections */
+        .section-container { margin-bottom: 45px; }
+        .section-container:first-of-type { margin-top: 10px; }
+        .section-header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; gap: 15px; }
+        .section-title { font-size: 1.4rem; font-weight: 600; letter-spacing: -0.3px; margin: 0; color: rgba(255, 255, 255, 0.95); }
+
+        /* Apple TV Sub-Category Toggle Controls */
+        .toggle-switch-group { display: flex; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); padding: 4px; border-radius: 14px; }
+        .switch-toggle-btn { background: transparent; color: var(--text-secondary); border: none; padding: 8px 18px; border-radius: 10px; font-size: 0.85rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); margin: 0; width: auto; box-shadow: none; }
+        .switch-toggle-btn.active { 
+            background: rgba(255, 255, 255, 0.12); color: #fff; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .switch-toggle-btn:hover:not(.active) { color: #fff; }
+
+        /* Horizontal Smooth Filmstrips */
+        .horizontal-scroll-row { display: flex; gap: 22px; overflow-x: auto; overflow-y: hidden; padding: 8px 4px 20px 4px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+        .horizontal-scroll-row::-webkit-scrollbar { height: 5px; }
+        .horizontal-scroll-row::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+        .horizontal-scroll-row::-webkit-scrollbar-thumb:hover { background: var(--sea-cyan); }
+
+        .grid-layout-block { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 24px; padding: 8px 4px; }
+
+        /* Top 10 Placements Styling with Ambient Glow Lights */
+        .rank-item-container { display: flex; align-items: flex-end; gap: 10px; flex: 0 0 auto; height: 100%; flex-shrink: 0; }
+        .rank-huge-number {
+            font-size: 7rem; font-weight: 900; line-height: 0.75; color: #ffffff;
+            font-family: 'Outfit', sans-serif; letter-spacing: -6px; min-width: 75px; text-align: center;
+            user-select: none; pointer-events: none; opacity: 0.95;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            background: linear-gradient(180deg, #ffffff 30%, rgba(255, 255, 255, 0.3) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            flex-shrink: 0;
+        }
+
+        /* Apple Motion Card Elements with Neon Light Borders */
+        .show-card {
+            position: relative; aspect-ratio: 2/3; border-radius: 18px; overflow: hidden; cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.06); box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); background: rgba(255, 255, 255, 0.02);
+            width: 150px; flex-shrink: 0;
+        }
+        .grid-layout-block .show-card { width: 100%; flex-shrink: 1; }
+
+        .show-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        .show-card:hover { 
+            transform: translateY(-8px) scale(1.03); 
+            border-color: var(--sea-cyan); 
+            box-shadow: 0 20px 40px rgba(0, 244, 255, 0.25), 0 0 15px rgba(0, 244, 255, 0.1); 
+        }
+        .show-card:hover img { transform: scale(1.05); }
+
+        .card-meta-overlay {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            background: linear-gradient(to top, rgba(4, 8, 20, 0.95) 0%, rgba(4, 8, 20, 0.4) 65%, transparent 100%);
+            padding: 16px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: flex-end; opacity: 0; transition: opacity 0.35s ease;
+        }
+        .show-card:hover .card-meta-overlay { opacity: 1; }
+        .card-title { font-size: 0.9rem; font-weight: 600; margin: 0 0 4px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
+        .card-sub { font-size: 0.75rem; color: var(--text-secondary); margin: 0; }
+
+        /* Search Layout Context */
+        .search-container { display: none; margin-bottom: 40px; animation: fadeIn 0.4s ease; }
+        .search-container.active { display: block; }
+        .search-input-field { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 18px 28px; border-radius: 20px; color: #fff; width: 100%; box-sizing: border-box; font-family: inherit; font-size: 1.1rem; transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+        .search-input-field:focus { outline: none; border-color: var(--sea-cyan); background: rgba(255,255,255,0.08); box-shadow: 0 0 30px rgba(0, 244, 255, 0.15); }
+
+        /* Series Detailed Deep Dive Portal */
+        .series-detail-view { display: none; animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        .series-detail-view.active { display: block; }
+        .series-detail-landscape { 
+            width: 100%; 
+            height: 38vh; 
+            min-height: 220px; 
+            max-height: 400px; 
+            border-radius: 28px; 
+            overflow: hidden; 
+            position: relative; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            margin-bottom: 35px; 
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6); 
+        }
+        .series-detail-landscape img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .series-info-container { padding: 10px; margin-bottom: 40px; }
+        .series-headline-title { font-size: 2.5rem; font-weight: 700; margin: 0 0 14px 0; letter-spacing: -1px; color: #fff; }
+        .series-meta-row { display: flex; align-items: center; gap: 16px; font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 22px; font-weight: 500; }
+        .series-synopsis-text { font-size: 1.05rem; line-height: 1.65; color: rgba(255,255,255,0.85); margin: 0 0 14px 0; transition: all 0.3s ease; max-width: 800px; }
+        .series-synopsis-text.truncated { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .btn-more-toggle { background: transparent; border: none; color: var(--sea-cyan); font-weight: 600; cursor: pointer; padding: 0; font-size: 0.95rem; margin-bottom: 25px; font-family: inherit; }
+        
+        /* Action Pill Buttons with Sea Cyan/Blue Accent Lights */
+        .interaction-actions-row { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 45px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 30px; }
+        .btn-action-pill { 
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 12px 22px; border-radius: 16px; 
+            font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: flex; align-items: center; gap: 8px; 
+        }
+        .btn-action-pill:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.25); transform: translateY(-2px); }
+        .btn-action-pill.active { 
+            background: linear-gradient(135deg, rgba(0, 244, 255, 0.2) 0%, rgba(0, 162, 255, 0.1) 100%); 
+            border-color: var(--sea-cyan); color: var(--sea-cyan); 
+            box-shadow: 0 10px 20px rgba(0, 244, 255, 0.15);
+        }
+
+        .episodes-section-title { font-size: 1.5rem; font-weight: 600; margin-bottom: 25px; letter-spacing: -0.3px; color: #fff; }
+        .episodes-list-wrapper { display: flex; flex-direction: column; gap: 18px; }
+        
+        /* Interactive Apple Tracklist Component Row */
+        .episode-item { 
+            display: flex; align-items: center; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); 
+            border-radius: 20px; padding: 18px; gap: 24px; cursor: pointer; transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1); 
+        }
+        .episode-item:hover { 
+            background: rgba(255,255,255,0.07); 
+            border-color: rgba(0, 162, 255, 0.3); 
+            transform: translateY(-3px); 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4), 0 0 20px rgba(0,162,255,0.05); 
+        }
+        .episode-thumb-wrap { width: 160px; aspect-ratio: 16/10; overflow: hidden; border-radius: 12px; background: #000; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.06); }
+        .episode-thumb-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .episode-core-meta { flex: 1; min-width: 0; }
+        .episode-headline-title { font-size: 1.15rem; font-weight: 600; margin: 0 0 8px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
+        .episode-synopsis-desc { font-size: 0.9rem; color: var(--text-secondary); margin: 0; line-height: 1.55; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        
+        /* Floating Play Lights */
+        .episode-play-icon-btn { 
+            width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); 
+            display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1rem; flex-shrink: 0; transition: all 0.3S cubic-bezier(0.16, 1, 0.3, 1); margin-left: auto; 
+        }
+        .episode-item:hover .episode-play-icon-btn { background: #fff; color: #040814; transform: scale(1.1); box-shadow: 0 0 20px rgba(255,255,255,0.5); }
+
+        /* Theater Modals Screen */
+        .video-theater-modal { position: fixed; top:0; left:0; width:100vw; height:100vh; background:#000000; z-index: 99999; display: none; flex-direction: column; justify-content: center; align-items: center; }
+        .video-theater-modal.active { display: flex; }
+        .theater-iframe-viewport { width: 100%; height: 100%; border: none; background: #000; }
+        .theater-close-btn { position: absolute; top: 30px; right: 30px; z-index: 100000; background: rgba(15,23,42,0.7); border: 1px solid rgba(255,255,255,0.2); padding: 14px 28px; border-radius: 14px; color: #fff; font-size: 0.95rem; font-weight: 600; cursor: pointer; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); transition: all 0.25s; font-family: inherit; }
+        .theater-close-btn:hover { background: #ff3838; border-color: #ff3838; box-shadow: 0 0 25px rgba(255,56,56,0.4); }
+
+        /* Orientation Lock Rules for Mobile Devices Only */
+        @media (max-width: 768px) and (orientation: landscape) {
+            body:not(.video-watching) #mobileOrientationEnforcer {
+                display: flex !important;
+            }
+        }
+
+        /* Video Landscape Lock Simulation Overlay for Phones held Vertically */
+        @media (max-width: 768px) and (orientation: portrait) {
+            body.video-watching #videoTheaterModal {
+                width: 100vh !important;
+                height: 100vw !important;
+                transform: rotate(90deg) !important;
+                transform-origin: center !important;
+                top: 50% !important;
+                left: 50% !important;
+                margin-top: -50vw !important;
+                margin-left: -50vh !important;
+            }
+            body.video-watching .theater-close-btn {
+                top: 30px !important;
+                right: 30px !important;
+            }
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <div id="mobileOrientationEnforcer" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #040814; z-index: 9999999; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 30px; box-sizing: border-box; backdrop-filter: blur(50px);">
+        <div style="font-weight: 700; font-size: 2.5rem; letter-spacing: -1px; background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 15px;">PERIN</div>
+        <h2 style="margin: 0 0 15px 0; font-weight: 500; font-size: 1.5rem; color: #fff;">Portrait Mode Required</h2>
+        <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5; max-width: 280px; margin: 0;">Please rotate your device to vertical portrait orientation to explore the catalog.</p>
+    </div>
+
+    <div id="backdrop" class="dynamic-backdrop"></div>
+    <div class="backdrop-overlay"></div>
+
+    <div id="splash">
+        <div class="netflix-logo">PERIN</div>
+    </div>
+
+    <div class="box" id="ui">
+        <h2 id="title">LOGIN</h2>
+        <div class="input-group">
+            <input id="nick" placeholder="Nickname" autocomplete="off">
+        </div>
+        <div class="input-group">
+            <input id="pass" type="password" placeholder="Password">
+        </div>
+        <div class="input-group">
+            <input id="cp" placeholder="Last 4 Digits CP" maxlength="4">
+        </div>
+        <button onclick="auth()" class="btn-auth" id="btnAction">SUBMIT</button>
+        <div>
+            <p onclick="toggleMode()" class="toggle-mode-text">Switch Login/Register</p>
+        </div>
+    </div>
+
+    <div class="persistent-bottom-navbar" id="universalNavBar">
+        <div class="nav-capsule-btn active" id="navHome" onclick="switchMainViewTab('home')">Home</div>
+        <div class="nav-capsule-btn" id="navSeries" onclick="switchMainViewTab('series')">Series</div>
+        <div class="nav-capsule-btn" id="navMovies" onclick="switchMainViewTab('movies')">Movies</div>
+        <div class="nav-capsule-btn" id="navSearch" onclick="switchMainViewTab('search')">Search</div>
+        <div class="nav-capsule-btn logout-accent" id="navLogout" onclick="userIntentLogOut()">Log Out</div>
+    </div>
+
+    <div class="spatial-wrapper" id="appDashboard">
+        <div class="spatial-panel">
+            
+            <div class="spatial-header">
+                <div class="brand-logo" onclick="switchMainViewTab('home')">PERIN</div>
+                <div style="text-align: right; color: var(--text-secondary); font-size: 0.9rem; font-weight: 500;" id="userDisplay"></div>
+            </div>
+
+            <div id="catalogDashboardContextBlock">
+                <div class="search-container" id="searchBarBlock">
+                    <input type="text" class="search-input-field" id="globalSearchInput" placeholder="Search title or tags within catalog..." oninput="executeClientSearch()">
+                </div>
+
+                <div class="hero-view" id="heroContainer"></div>
+
+                <div class="section-container" id="top10SectionWrap">
+                    <div class="section-header-row">
+                        <h3 class="section-title" id="top10DynamicTitle">Top Placements</h3>
+                        <div class="toggle-switch-group">
+                            <button class="switch-toggle-btn active" id="btnTop10Series" onclick="toggleTop10Category('series')">Series</button>
+                            <button class="switch-toggle-btn" id="btnTop10Movies" onclick="toggleTop10Category('movies')">Movies</button>
+                        </div>
+                    </div>
+                    <div class="horizontal-scroll-row" id="top10Grid"></div>
+                </div>
+
+                <div class="section-container" id="exploreAllSectionWrap">
+                    <div class="section-header-row">
+                        <h3 class="section-title" id="exploreSectionTitle">Explore All Programs</h3>
+                    </div>
+                    <div id="exploreAllGrid"></div>
+                </div>
+
+                <div id="dynamicRecommendationsContainer"></div>
+            </div>
+
+            <div id="seriesExplorerDetailBlock" class="series-detail-view">
+                <div class="series-detail-landscape" id="seriesDetailBackdropWrap"></div>
+                <div class="series-info-container">
+                    <h1 class="series-headline-title" id="seriesDetailTitle">Series Title</h1>
+                    <div class="series-meta-row" id="seriesDetailMetaRow"></div>
+                    <p class="series-synopsis-text truncated" id="seriesDetailSynopsis"></p>
+                    <button class="btn-more-toggle" id="seriesSynopsisToggleBtn" onclick="toggleSynopsisWrapText()">More</button>
+                    
+                    <div class="interaction-actions-row">
+                        <button class="btn-action-pill" onclick="triggerPillFeedback(this, 'Liked!')">👍 Like</button>
+                        <button class="btn-action-pill" onclick="triggerPillFeedback(this, 'Rated 5 Stars!')">⭐ Rate</button>
+                        <button class="btn-action-pill" onclick="triggerPillFeedback(this, 'Added to My List!')">➕ Add to List</button>
+                    </div>
+
+                    <h3 class="episodes-section-title">List of Episodes</h3>
+                    <div class="episodes-list-wrapper" id="seriesEpisodesContainer"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="video-theater-modal" id="videoTheaterModal">
+        <button class="theater-close-btn" onclick="terminateTheaterStreamingSession()">✕ Close Player</button>
+        <iframe id="theaterIframeNode" class="theater-iframe-viewport" allowfullscreen sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"></iframe>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getDatabase, ref, get, set, update, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+        const db = getDatabase(initializeApp({ databaseURL: "https://perinstream-default-rtdb.asia-southeast1.firebasedatabase.app/" }));
+        
+        let mode = 'login';
+        let myDev = localStorage.getItem('did') || crypto.randomUUID();
+        localStorage.setItem('did', myDev);
+
+        let moviesCache = [];
+        let seriesCache = [];
+        let top10Cache = {};
+        let recTypesCache = {};
+        let activeTabContext = 'home'; 
+        let activeTop10SubContext = 'series';
+        let userRealtimeListenerUnsubscribe = null;
+
+        // Force-prevent Pinch/Spread Zooming Gestures on iOS devices
+        document.addEventListener('gesturestart', function (e) {
+            e.preventDefault();
+        });
+        document.addEventListener('touchmove', function (event) {
+            if (event.scale !== undefined && event.scale !== 1) { event.preventDefault(); }
+        }, { passive: false });
+
+        async function cacheSystemDatasets() {
+            try {
+                const [top10Snap, moviesSnap, seriesSnap, recSnap] = await Promise.all([
+                    get(ref(db, 'top10')),
+                    get(ref(db, 'movies')),
+                    get(ref(db, 'series')),
+                    get(ref(db, 'recTypes'))
+                ]);
+
+                if (top10Snap.exists()) top10Cache = top10Snap.val();
+                if (recSnap.exists()) recTypesCache = recSnap.val();
+
+                if (moviesSnap.exists()) {
+                    moviesSnap.forEach(snap => {
+                        moviesCache.push({ key: snap.key, ...snap.val(), itemType: 'movie' });
+                    });
+                }
+                if (seriesSnap.exists()) {
+                    seriesSnap.forEach(snap => {
+                        seriesCache.push({ key: snap.key, ...snap.val(), itemType: 'series' });
+                    });
+                }
+                
+                applyRandomLoginBackdrop();
+                checkExistingPersistentSession();
+            } catch (err) {
+                console.log("Database mapping pipeline initialization error:", err);
+            }
+        }
+
+        function applyRandomLoginBackdrop() {
+            let landscapes = [];
+            let activeTitles = [];
+            for (let k in top10Cache) {
+                if (top10Cache[k] && top10Cache[k].trim() !== "") activeTitles.push(top10Cache[k].trim().toLowerCase());
+            }
+            [...moviesCache, ...seriesCache].forEach(p => {
+                if (p.land && activeTitles.includes((p.title || "").trim().toLowerCase())) landscapes.push(p.land);
+            });
+            if (landscapes.length > 0) {
+                const pick = landscapes[Math.floor(Math.random() * landscapes.length)];
+                document.getElementById('backdrop').style.backgroundImage = `url('${pick}')`;
+            }
+        }
+
+        function checkExistingPersistentSession() {
+            const savedUser = localStorage.getItem('sessionUser');
+            if (savedUser) {
+                attachRealtimeUserListener(savedUser);
+            }
+        }
+
+        cacheSystemDatasets();
+
+        setTimeout(() => {
+            const splash = document.getElementById('splash');
+            splash.classList.add('fade-out');
+            document.body.classList.add('ready');
+            setTimeout(() => splash.remove(), 800);
+        }, 2600); 
+        
+        window.toggleMode = () => {
+            mode = (mode === 'login') ? 'register' : 'login';
+            document.getElementById('title').innerText = mode.toUpperCase();
+        };
+
+        function terminateSessionAndKickOut(message, clearSessionPermanently = true) {
+            if (userRealtimeListenerUnsubscribe) {
+                userRealtimeListenerUnsubscribe();
+                userRealtimeListenerUnsubscribe = null;
+            }
+            
+            if (clearSessionPermanently) {
+                localStorage.removeItem('sessionUser');
+            }
+
+            if (message) alert(message);
+            
+            document.getElementById('catalogDashboardContextBlock').style.display = 'block';
+            document.getElementById('seriesExplorerDetailBlock').classList.remove('active');
+            document.getElementById('appDashboard').classList.remove('active');
+            document.getElementById('universalNavBar').classList.remove('visible');
+            document.getElementById('ui').style.display = 'block';
+            document.getElementById('pass').value = "";
+            document.getElementById('nick').value = "";
+            document.getElementById('cp').value = "";
+        }
+
+        window.userIntentLogOut = () => {
+            terminateSessionAndKickOut("You have been successfully logged out.", true);
+        };
+
+        function attachRealtimeUserListener(username) {
+            if (userRealtimeListenerUnsubscribe) userRealtimeListenerUnsubscribe();
+
+            let initialSyncCompleted = false;
+
+            userRealtimeListenerUnsubscribe = onValue(ref(db, 'users/' + username), (liveSnapshot) => {
+                if (!liveSnapshot.exists()) {
+                    terminateSessionAndKickOut("Access Denied: This account no longer exists on the server.", true);
+                    return;
+                }
+                
+                const userData = liveSnapshot.val();
+                if (!userData.isApproved) {
+                    terminateSessionAndKickOut("Access Denied: Your account approval status has been revoked.", true);
+                    return;
+                }
+
+                if (userData.approvedDeviceId && userData.approvedDeviceId !== myDev) {
+                    terminateSessionAndKickOut("Access Denied: This account is registered to another device.", true);
+                    return;
+                }
+
+                if (!initialSyncCompleted) {
+                    initialSyncCompleted = true;
+                    localStorage.setItem('sessionUser', username);
+                    launchSpatialDashboard(username);
+                }
+            }, (error) => {
+                terminateSessionAndKickOut("Session connection dropped or permission denied.", false);
+            });
+        }
+
+        window.auth = async () => {
+            const n = document.getElementById('nick').value.trim();
+            const p = document.getElementById('pass').value;
+            const c = document.getElementById('cp').value;
+
+            if (!n) return alert("Please enter a nickname.");
+
+            if (mode === 'register') {
+                const userCheck = await get(ref(db, 'users/' + n));
+                if (userCheck.exists()) {
+                    return alert("This nickname is already registered to an account.");
+                }
+
+                const entireUsersDb = await get(ref(db, 'users'));
+                if (entireUsersDb.exists()) {
+                    let deviceHasAccount = false;
+                    entireUsersDb.forEach(child => {
+                        if (child.val().approvedDeviceId === myDev) {
+                            deviceHasAccount = true;
+                        }
+                    });
+                    if (deviceHasAccount) {
+                        return alert("Access Denied: This device is already linked to another account.");
+                    }
+                }
+
+                await set(ref(db, 'users/' + n), { 
+                    password: p, 
+                    lastFourCp: c, 
+                    isApproved: false, 
+                    approvedDeviceId: myDev 
+                });
+                document.getElementById('ui').innerHTML = "<div class='state-message'><h1>Please wait for our Team to approve your Account.</h1></div>";
+            } else {
+                const snap = await get(ref(db, 'users/' + n));
+                if (!snap.exists() || snap.val().password !== p) return alert("Invalid Username or Password");
+                if (!snap.val().isApproved) return document.getElementById('ui').innerHTML = "<div class='state-message'><h1>Pending Approval!</h1></div>";
+                
+                if (snap.val().approvedDeviceId && snap.val().approvedDeviceId !== myDev) {
+                    return alert("Access Denied: This account is linked to another device.");
+                }
+                
+                if (!snap.val().approvedDeviceId) {
+                    await update(ref(db, 'users/' + n), { approvedDeviceId: myDev });
+                }
+                
+                attachRealtimeUserListener(n);
+            }
+        };
+
+        function launchSpatialDashboard(username) {
+            document.getElementById('ui').style.display = 'none';
+            document.getElementById('userDisplay').innerText = `@${username}`;
+
+            switchMainViewTab('home');
+
+            document.getElementById('appDashboard').classList.add('active');
+            document.getElementById('universalNavBar').classList.add('visible');
+        }
+
+        function generateBanner(categoryContext) {
+            let activeTitles = [];
+            let pool = [];
+
+            if (categoryContext === 'home') {
+                for (let k in top10Cache) {
+                    if (top10Cache[k] && top10Cache[k].trim() !== "") activeTitles.push(top10Cache[k].trim().toLowerCase());
+                }
+                pool = [...moviesCache, ...seriesCache].filter(p => p.land && activeTitles.includes((p.title || "").trim().toLowerCase()));
+            } else if (categoryContext === 'series') {
+                for (let i = 1; i <= 10; i++) {
+                    let t = top10Cache[`series_${i}`];
+                    if (t && t.trim() !== "") activeTitles.push(t.trim().toLowerCase());
+                }
+                pool = seriesCache.filter(p => p.land && activeTitles.includes((p.title || "").trim().toLowerCase()));
+            } else if (categoryContext === 'movies') {
+                for (let i = 1; i <= 10; i++) {
+                    let t = top10Cache[`movies_${i}`];
+                    if (t && t.trim() !== "") activeTitles.push(t.trim().toLowerCase());
+                }
+                pool = moviesCache.filter(p => p.land && activeTitles.includes((p.title || "").trim().toLowerCase()));
+            }
+
+            if (pool.length === 0) {
+                pool = categoryContext === 'series' ? seriesCache : (categoryContext === 'movies' ? moviesCache : [...moviesCache, ...seriesCache]);
+            }
+
+            const container = document.getElementById('heroContainer');
+            if (pool.length > 0) {
+                const hero = pool[Math.floor(Math.random() * pool.length)];
+                const releaseYear = hero.date ? hero.date.split('-')[0] : 'N/A';
+                const maturity = hero.age || 'PG-13';
+                const seasonCount = hero.itemType === 'series' ? (hero.sea ? `${hero.sea} Seasons` : '1 Season') : 'Movie';
+
+                container.innerHTML = `
+                    <img src="${hero.land}" class="hero-img" alt="Hero Banner Asset">
+                    <div class="hero-gradient"></div>
+                    <div class="hero-details">
+                        <h1 class="hero-title">${hero.title}</h1>
+                        <div class="hero-meta">
+                            <span class="meta-badge">${maturity}</span>
+                            <span>${releaseYear}</span>
+                            <span>•</span>
+                            <span>${seasonCount}</span>
+                        </div>
+                        <div class="hero-actions">
+                            <button class="btn-prime" onclick="handleCardIntentPlaySelection('${hero.itemType}', '${hero.key}')">Watch Now</button>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('backdrop').style.backgroundImage = `url('${hero.land}')`;
+            } else {
+                container.innerHTML = "";
+            }
+        }
+
+        window.toggleTop10Category = (targetCat) => {
+            activeTop10SubContext = targetCat;
+            document.getElementById('btnTop10Series').classList.toggle('active', targetCat === 'series');
+            document.getElementById('btnTop10Movies').classList.toggle('active', targetCat === 'movies');
+            renderTopHorizontalSection();
+        };
+
+        window.switchMainViewTab = (targetContext) => {
+            activeTabContext = targetContext;
+            
+            document.getElementById('navHome').classList.toggle('active', targetContext === 'home');
+            document.getElementById('navSeries').classList.toggle('active', targetContext === 'series');
+            document.getElementById('navMovies').classList.toggle('active', targetContext === 'movies');
+            document.getElementById('navSearch').classList.toggle('active', targetContext === 'search');
+            
+            document.getElementById('catalogDashboardContextBlock').style.display = 'block';
+            document.getElementById('seriesExplorerDetailBlock').classList.remove('active');
+
+            const searchBarBlock = document.getElementById('searchBarBlock');
+            const top10SectionWrap = document.getElementById('top10SectionWrap');
+            const exploreAllSectionWrap = document.getElementById('exploreAllSectionWrap');
+            const heroContainer = document.getElementById('heroContainer');
+            const dynRecWrap = document.getElementById('dynamicRecommendationsContainer');
+
+            if (targetContext === 'home') {
+                searchBarBlock.classList.remove('active');
+                heroContainer.style.display = 'block';
+                top10SectionWrap.style.display = 'block';
+                exploreAllSectionWrap.style.display = 'block';
+                dynRecWrap.style.display = 'block';
+                
+                document.getElementById('exploreSectionTitle').innerText = "Explore All Programs";
+                generateBanner('home');
+                renderTopHorizontalSection();
+                renderAllHorizontalSection(null, false); 
+                buildDynamicRecommendationRows();
+            } 
+            else if (targetContext === 'series') {
+                searchBarBlock.classList.remove('active');
+                heroContainer.style.display = 'block';
+                top10SectionWrap.style.display = 'none';
+                exploreAllSectionWrap.style.display = 'block';
+                dynRecWrap.style.display = 'none';
+                
+                document.getElementById('exploreSectionTitle').innerText = "All Series Catalog Records";
+                generateBanner('series');
+                renderAllHorizontalSection(seriesCache, true);
+            } 
+            else if (targetContext === 'movies') {
+                searchBarBlock.classList.remove('active');
+                heroContainer.style.display = 'block';
+                top10SectionWrap.style.display = 'none';
+                exploreAllSectionWrap.style.display = 'block';
+                dynRecWrap.style.display = 'none';
+                
+                document.getElementById('exploreSectionTitle').innerText = "All Movies Catalog Records";
+                generateBanner('movies');
+                renderAllHorizontalSection(moviesCache, true);
+            } 
+            else if (targetContext === 'search') {
+                searchBarBlock.classList.add('active');
+                heroContainer.style.display = 'none';
+                top10SectionWrap.style.display = 'none';
+                exploreAllSectionWrap.style.display = 'block';
+                dynRecWrap.style.display = 'none';
+                
+                document.getElementById('exploreSectionTitle').innerText = "Filtered Results Output Grid matches";
+                document.getElementById('globalSearchInput').value = "";
+                executeClientSearch();
+            }
+        };
+
+        function renderTopHorizontalSection() {
+            const grid = document.getElementById('top10Grid');
+            grid.innerHTML = "";
+            let trackingCounter = 0;
+
+            document.getElementById('top10DynamicTitle').innerText = activeTop10SubContext === 'series' ? "Top 10 Series" : "Top 10 Movies";
+
+            for (let i = 1; i <= 10; i++) {
+                const searchLookupIndex = `${activeTop10SubContext}_${i}`;
+                const databaseTargetConfigTitle = top10Cache[searchLookupIndex];
+                
+                if (databaseTargetConfigTitle && databaseTargetConfigTitle.trim() !== "") {
+                    const workingDataArray = activeTop10SubContext === 'series' ? seriesCache : moviesCache;
+                    const linkedRecordObject = workingDataArray.find(item => (item.title || "").toLowerCase().trim() === databaseTargetConfigTitle.toLowerCase().trim());
+
+                    if (linkedRecordObject && linkedRecordObject.port) {
+                        trackingCounter++;
+                        const containerItem = document.createElement('div');
+                        containerItem.className = 'rank-item-container';
+                        containerItem.innerHTML = `
+                            <div class="rank-huge-number">${i}</div>
+                            <div class="show-card" onclick="handleCardIntentPlaySelection('${linkedRecordObject.itemType}', '${linkedRecordObject.key}')">
+                                <img src="${linkedRecordObject.port}" alt="Poster Record Entry">
+                                <div class="card-meta-overlay">
+                                    <p class="card-title">${linkedRecordObject.title}</p>
+                                    <p class="card-sub">${linkedRecordObject.age || 'General Access'}</p>
+                                </div>
+                            </div>
+                        `;
+                        grid.appendChild(containerItem);
+                    }
+                }
+            }
+
+            if (trackingCounter === 0) {
+                grid.innerHTML = `<p style="color: var(--text-secondary); font-size: 0.85rem; padding: 15px;">No active ranking registries match criteria discovered on server node.</p>`;
+            }
+        }
+
+        function renderAllHorizontalSection(alternateTargetPool = null, useGridMode = false) {
+            const grid = document.getElementById('exploreAllGrid');
+            grid.className = useGridMode ? "grid-layout-block" : "horizontal-scroll-row";
+            grid.innerHTML = "";
+            const processingArrayContext = alternateTargetPool || [...seriesCache, ...moviesCache];
+
+            if (processingArrayContext.length === 0) {
+                grid.innerHTML = `<p style="color: var(--text-secondary); font-size: 0.85rem; padding: 15px;">No structural registries matched query parameters.</p>`;
+                return;
+            }
+
+            processingArrayContext.forEach(program => {
+                if (program.port) {
+                    const card = document.createElement('div');
+                    card.className = 'show-card';
+                    const visualLabelStr = program.itemType === 'series' ? (program.sea ? `${program.sea} Seasons` : 'Series') : 'Movie';
+                    card.onclick = () => handleCardIntentPlaySelection(program.itemType, program.key);
+                    
+                    card.innerHTML = `
+                        <img src="${program.port}" alt="Poster Asset">
+                        <div class="card-meta-overlay">
+                            <p class="card-title">${program.title}</p>
+                            <p class="card-sub">${visualLabelStr} • ${program.age || 'Approved'}</p>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                }
+            });
+        }
+
+        function buildDynamicRecommendationRows() {
+            const container = document.getElementById('dynamicRecommendationsContainer');
+            container.innerHTML = "";
+
+            for (let recId in recTypesCache) {
+                const recData = recTypesCache[recId];
+                if (!recData || !recData.name) continue;
+
+                const secWrap = document.createElement('div');
+                secWrap.className = 'section-container';
+
+                const headerRow = document.createElement('div');
+                headerRow.className = 'section-header-row';
+                headerRow.innerHTML = `<h3 class="section-title">${recData.name}</h3>`;
+                secWrap.appendChild(headerRow);
+
+                const scrollRow = document.createElement('div');
+                scrollRow.className = 'horizontal-scroll-row';
+
+                let validAttachedCount = 0;
+
+                if (recData.programs) {
+                    for (let pId in recData.programs) {
+                        const recItem = recData.programs[pId];
+                        const referencePool = recItem.type === 'movie' ? moviesCache : seriesCache;
+                        const fullMetadataObject = referencePool.find(item => item.key === recItem.programKey);
+
+                        if (fullMetadataObject && fullMetadataObject.port) {
+                            validAttachedCount++;
+                            const card = document.createElement('div');
+                            card.className = 'show-card';
+                            const visualLabelStr = fullMetadataObject.itemType === 'series' ? (fullMetadataObject.sea ? `${fullMetadataObject.sea} Seasons` : 'Series') : 'Movie';
+                            card.onclick = () => handleCardIntentPlaySelection(fullMetadataObject.itemType, fullMetadataObject.key);
+
+                            card.innerHTML = `
+                                <img src="${fullMetadataObject.port}" alt="Poster Asset">
+                                <div class="card-meta-overlay">
+                                    <p class="card-title">${fullMetadataObject.title}</p>
+                                    <p class="card-sub">${visualLabelStr} • ${fullMetadataObject.age || 'Approved'}</p>
+                                </div>
+                            `;
+                            scrollRow.appendChild(card);
+                        }
+                    }
+                }
+
+                if (validAttachedCount === 0) {
+                    scrollRow.innerHTML = `<p style="color: var(--text-secondary); font-size: 0.85rem; padding: 15px;">No active programs linked in this list config.</p>`;
+                }
+
+                secWrap.appendChild(scrollRow);
+                container.appendChild(secWrap);
+            }
+        }
+
+        window.executeClientSearch = () => {
+            const queryConstraintToken = document.getElementById('globalSearchInput').value.toLowerCase().trim();
+            const evaluationPool = [...seriesCache, ...moviesCache];
+            
+            if(!queryConstraintToken) {
+                renderAllHorizontalSection(evaluationPool, false);
+                return;
+            }
+            
+            const filteringMatches = evaluationPool.filter(item => 
+                (item.title || "").toLowerCase().includes(queryConstraintToken) || 
+                (item.keywords || "").toLowerCase().includes(queryConstraintToken) ||
+                (item.age || "").toLowerCase().includes(queryConstraintToken)
+            );
+            renderAllHorizontalSection(filteringMatches, true);
+        };
+
+        window.handleCardIntentPlaySelection = (type, uniqueKey) => {
+            if (type === 'movie') {
+                const targetMovieData = moviesCache.find(m => m.key === uniqueKey);
+                if (targetMovieData && targetMovieData.streamUrl) {
+                    initiateTheaterStreamingSession(targetMovieData.streamUrl);
+                } else {
+                    alert("This stream configuration is empty or pending stream source upload.");
+                }
+            } else if (type === 'series') {
+                launchSeriesDetailedPanelExplorer(uniqueKey);
+            }
+        };
+
+        async function launchSeriesDetailedPanelExplorer(seriesKey) {
+            const cachedObject = seriesCache.find(s => s.key === seriesKey);
+            if(!cachedObject) return;
+
+            document.getElementById('catalogDashboardContextBlock').style.display = 'none';
+            const detailBlock = document.getElementById('seriesExplorerDetailBlock');
+            detailBlock.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            const fallbackLandImg = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200"><rect width="100%" height="100%" fill="%23111"/></svg>';
+            document.getElementById('seriesDetailBackdropWrap').innerHTML = `<img src="${cachedObject.land || fallbackLandImg}" alt="Landscape Show Banner">`;
+            document.getElementById('seriesDetailTitle').innerText = cachedObject.title || "Untitled Show";
+            
+            const releaseYear = cachedObject.date ? cachedObject.date : 'N/A';
+            const seasonLabel = cachedObject.sea ? `${cachedObject.sea} Seasons` : '1 Season';
+            document.getElementById('seriesDetailMetaRow').innerHTML = `
+                <span class="meta-badge">${cachedObject.age || 'General'}</span>
+                <span>Year: ${releaseYear}</span>
+                <span>•</span>
+                <span>${seasonLabel}</span>
+            `;
+
+            const synopsisEl = document.getElementById('seriesDetailSynopsis');
+            synopsisEl.innerText = cachedObject.synopsis || "No story summary or plot description details uploaded yet for this series program production.";
+            synopsisEl.classList.add('truncated');
+            document.getElementById('seriesSynopsisToggleBtn').innerText = "More";
+
+            const episodesContainer = document.getElementById('seriesEpisodesContainer');
+            episodesContainer.innerHTML = `<p style="color:var(--text-secondary); font-size:0.9rem; padding:10px;">Loading episodes index map...</p>`;
+
+            try {
+                const epSnapshot = await get(ref(db, `series/${seriesKey}/episodes`));
+                episodesContainer.innerHTML = "";
+                
+                if (epSnapshot.exists()) {
+                    let counter = 0;
+                    epSnapshot.forEach(child => {
+                        counter++;
+                        const epData = child.val();
+                        const epCardRow = document.createElement('div');
+                        epCardRow.className = 'episode-item';
+                        
+                        const epThumb = epData.epPic || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="80"><rect width="100%" height="100%" fill="%23111"/><text x="50%" y="50%" text-anchor="middle" fill="%23444" font-size="10">No Pic</text></svg>';
+                        const displaySummary = epData.synopsis ? epData.synopsis : "No custom description overview entered for this episode segment.";
+
+                        epCardRow.onclick = () => {
+                            if(epData.streamUrl) {
+                                initiateTheaterStreamingSession(epData.streamUrl);
+                            } else {
+                                alert("Episode video stream resource link is empty or pending.");
+                            }
+                        };
+
+                        epCardRow.innerHTML = `
+                            <div class="episode-thumb-wrap">
+                                <img src="${epThumb}" alt="Episode Artwork">
+                            </div>
+                            <div class="episode-core-meta">
+                                <h4 class="episode-headline-title">${counter}. ${epData.title || ('Episode ' + counter)}</h4>
+                                <p class="episode-synopsis-desc">${displaySummary}</p>
+                            </div>
+                            <div class="episode-play-icon-btn">▶</div>
+                        `;
+                        episodesContainer.appendChild(epCardRow);
+                    });
+                } else {
+                    episodesContainer.innerHTML = `<p style="color:var(--text-secondary); font-size:0.9rem;">No episodes configured for this series record on server node.</p>`;
+                }
+            } catch(e) {
+                episodesContainer.innerHTML = `<p style="color:#ff4b4b; font-size:0.85rem;">Failed retrieving episode tracklist items link index node maps.</p>`;
+            }
+        }
+
+        window.toggleSynopsisWrapText = () => {
+            const synopsisEl = document.getElementById('seriesDetailSynopsis');
+            const btn = document.getElementById('seriesSynopsisToggleBtn');
+            if (synopsisEl.classList.contains('truncated')) {
+                synopsisEl.classList.remove('truncated');
+                btn.innerText = "Less";
+            } else {
+                synopsisEl.classList.add('truncated');
+                btn.innerText = "More";
+            }
+        };
+
+        window.triggerPillFeedback = (buttonElement, textMessage) => {
+            buttonElement.classList.add('active');
+            alert(textMessage);
+        };
+
+        window.initiateTheaterStreamingSession = (url) => {
+            document.body.classList.add('video-watching');
+            const playerModal = document.getElementById('videoTheaterModal');
+            const iframe = document.getElementById('theaterIframeNode');
+            iframe.src = url;
+            playerModal.classList.add('active');
+
+            if (window.innerWidth <= 768 && screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock("landscape").catch(() => {});
+            }
+
+            if (playerModal.requestFullscreen) {
+                playerModal.requestFullscreen().catch(() => {});
+            } else if (playerModal.webkitRequestFullscreen) {
+                playerModal.webkitRequestFullscreen();
+            }
+        };
+
+        window.terminateTheaterStreamingSession = () => {
+            document.body.classList.remove('video-watching');
+            const playerModal = document.getElementById('videoTheaterModal');
+            document.getElementById('theaterIframeNode').src = "";
+            playerModal.classList.remove('active');
+
+            if (window.innerWidth <= 768 && screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock("portrait").catch(() => {});
+            }
+
+            if (document.exitFullscreen) {
+                document.exitFullscreen().catch(() => {});
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            }
+        };
+    </script>
+</body>
+</html>
